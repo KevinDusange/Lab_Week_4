@@ -6,7 +6,7 @@ users:
     shell: /bin/bash
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     ssh-authorized-keys:
-      - <public-key>
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJlJM/nKz0ReFp0a1L4JfIxFzzPrbGBR4UWKXaPACKCB kevin@Kevins-ThinkPad
 
 package_update: true
 package_upgrade: true
