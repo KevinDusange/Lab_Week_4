@@ -155,7 +155,7 @@ resource "aws_key_pair" "local_key" {
 resource "aws_instance" "web" {
 	ami 				   = data.aws_ami.debian.id
 	instance_type          = "t2.micro"
-	vpc_security_group_ids = aws_vpc.web.id
+	vpc_security_group_ids = aws_security_group.web.id
 	subnet_id              = aws_subnet.web.id
 	user_data			   = file("${path.module}/scripts/cloud-config.yml")
   tags = {
