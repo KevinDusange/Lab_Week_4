@@ -27,7 +27,5 @@ Commands used for Terraform:
 - Get output values - terraform output
 
 Once deployed, connect to your instance:
-- ssh -i lab4.pub web@<ec2_dns_name>
+- ssh -i ~/.ssh/<private_key_file> web@<ec2_dns_name>
   - change the ec2_public_ip to your ec2's dns name
-
-See lab instructions on D2L for details
