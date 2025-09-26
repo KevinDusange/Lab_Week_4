@@ -35,11 +35,10 @@ data "aws_ami" "debian" {
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc
 resource "aws_vpc" "web" {
   cidr_block           = "10.0.0.0/16"
-	# enable dns enable_dns_hostnames
+  enable_dns_hostnames = true
 
   tags = {
-    Name    = "project_vpc"
-		# add project name using local
+    Name    = "4640_lab4"
   }
 }
 
