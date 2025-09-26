@@ -154,7 +154,7 @@ resource "aws_key_pair" "local_key" {
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance
 resource "aws_instance" "web" {
 	ami 				   = data.aws_ami.debian.id
-	instance_type          = "t2.micro
+	instance_type          = "t2.micro"
 	vpc_security_group_ids = aws_vpc.web.id
 	subnet_id              = aws_subnet.web.id
 	user_data			   = file("${path.module}/scripts/cloud-config.yml")
