@@ -23,7 +23,7 @@ locals {
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami
 data "aws_ami" "debian" {
   most_recent = true
-  owners      = ["amazon"]
+  owners      = ["136693071363"]
 
   filter {
     name   = "name"
@@ -38,7 +38,7 @@ resource "aws_vpc" "web" {
   enable_dns_hostnames = true
 
   tags = {
-    Name    = "4640_lab4"
+    Name    = "project_VPC"
   }
 }
 
@@ -49,8 +49,9 @@ resource "aws_vpc" "web" {
 resource "aws_subnet" "web" {
   vpc_id                  = aws_vpc.web.id
   cidr_block              = "10.0.1.0/24"
-	# set availability zone
-	# add public ip on launch
+  availability_zone       = "us-west-2a"
+  map_public_ip_on_lauch  = true
+
 
   tags = {
     Name = "Web"
@@ -65,6 +66,7 @@ resource "aws_internet_gateway" "web-gw" {
 
   tags = {
     Name = "Web"
+	Project = "local.project_name"
 		# add project name using local
   }
 }
@@ -72,10 +74,12 @@ resource "aws_internet_gateway" "web-gw" {
 # create route table for web VPC 
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table
 resource "aws_route_table" "web" {
+  vpc_id = aws_vpc.web.id
 	# add vpc 
 
   tags = {
     Name = "web-route"
+	Project = "local.project_name"
 		# add project name using local
   }
 }
@@ -110,7 +114,10 @@ resource "aws_security_group" "web" {
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule
 resource "aws_vpc_security_group_ingress_rule" "web-ssh" {
   security_group_id = aws_security_group.web.id
-
+  cidr_ipv4   = "0.0.0.0/0"
+  from_port   = 22
+  ip_protocol = "tcp"
+  to_port     = 22
   # allow ssh anywhere
 }
 
@@ -118,7 +125,10 @@ resource "aws_vpc_security_group_ingress_rule" "web-ssh" {
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule
 resource "aws_vpc_security_group_ingress_rule" "web-http" {
   security_group_id = aws_security_group.web.id
-
+  cidr_ipv4   = "0.0.0.0/0"
+  from_port   = 80
+  ip_protocol = "tcp"
+  to_port     = 80
 	# allow http anywhere
 }
 
@@ -135,22 +145,22 @@ resource "aws_vpc_security_group_egress_rule" "web-egress" {
 # if we weren't adding the public key in the cloud-init script we could import a public 
 # using the aws_key_pair resource block
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair
-# resource "aws_key_pair" "local_key" {
-#   key_name   = "web-key"
-#   public_key = file("~/.ssh/aws.pub")
-# }
+resource "aws_key_pair" "local_key" {
+  key_name   = "web-key"
+  public_key = file("~/.ssh/aws.pub")
+}
 
 # create the ec2 instance
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance
 resource "aws_instance" "web" {
-	# use ami provided by data block above
-  # set instance type
-	# add user datat for cloud-config file in scripts directory
-	# add vpc security group 
-  subnet_id              = aws_subnet.web.id
-
+	ami 				   = data.aws_ami.debian.id
+	instance_type          = "t2.micro
+	vpc_security_group_ids = aws_vpc.web.id
+	subnet_id              = aws_subnet.web.id
+	user_data			   = file("${path.module}/scripts/cloud-config.yml")
   tags = {
     Name = "Web"
+	Project = local.project_name
 		# add project name using local
   }
 }
